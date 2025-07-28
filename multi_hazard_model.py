@@ -1,14 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # 🗺️ Multi-Hazard Susceptibility Model (Clean Version)
-# This notebook aligns all raster layers, applies AHP weighting, and produces a final hazard map.
-
-# In[1]:
 
 
-
-## Step 1: Load Required Libraries
+ Step 1: Load Required Libraries
 
 We begin by importing the essential Python libraries used throughout this analysis:
 
@@ -31,10 +23,10 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 
-# In[2]:
 
 
-# Step 2: Define Raster Alignment Function
+
+ Step 2: Define Raster Alignment Function
 def align_raster_to_reference(src_path, ref_path, out_path):
     with rasterio.open(ref_path) as ref:
         ref_meta = ref.meta.copy()
@@ -69,7 +61,7 @@ def align_raster_to_reference(src_path, ref_path, out_path):
             dst.write(aligned_data, 1)
 
 
-# In[4]:
+
 
 
 import rasterio
@@ -103,11 +95,11 @@ def calculate_slope(dem_path, slope_path):
         with rasterio.open(slope_path, 'w', **profile) as dst:
             dst.write(slope_deg.astype(rasterio.float32), 1)
 
-# 🏔️ Generate slope raster
+# Generate slope raster
 calculate_slope("thesis_data/dem.tif", "thesis_data/slope_degree.tif")
 
 
-# In[7]:
+
 
 
 import rasterio
@@ -116,7 +108,7 @@ with rasterio.open("thesis_data/slope_degree.tif") as src:
 #slope_deg = np.where(np.isnan(slope_deg), 0, slope_deg)
 
 
-# In[8]:
+
 
 
 # Step 3: Align All Layers (with error handling)
@@ -159,10 +151,10 @@ with open(input_dir / "cyclone_path.tif", "rb") as src_file:
 data_dir = aligned_dir
 
 
-# In[10]:
 
 
-# Step 3.5: AHP Pairwise Comparison & Weight Derivation
+
+# Step 5: AHP Pairwise Comparison & Weight Derivation
 
 import numpy as np
 import pandas as pd
@@ -172,7 +164,7 @@ criteria = [
     "Roads", "CycloneP", "CycloneS"
 ]
 
-# Your pairwise matrix
+# pairwise matrix
 matrix = np.array([
     [1,    3,    3,    3,    2,    2,    2],
     [1/3,  1,    2,    3,    4,    2,    2],
@@ -222,12 +214,10 @@ CR = CI / RI
 print(f"\n🧠 Consistency Index (CI): {CI:.4f}")
 print(f"📏 Consistency Ratio (CR): {CR:.4f}")
 if CR < 0.1:
-    print("✅ Judgments are consistent (CR < 0.10)")
+    print(" Judgments are consistent (CR < 0.10)")
 else:
-    print("⚠️ Judgments may be inconsistent (CR ≥ 0.10)")
+    print(" Judgments may be inconsistent (CR ≥ 0.10)")
 
-
-# In[26]:
 
 
 from pathlib import Path
@@ -279,16 +269,16 @@ import numpy.ma as ma
 from matplotlib import cm
 from matplotlib.colors import ListedColormap
 
-# ✅ Apply final mask (already done)
+#  Apply final mask (already done)
 masked_score = ma.masked_invalid(masked_score)
 
-# ✅ Green-to-red gradient (reversed)
+#  Green-to-red gradient (reversed)
 cmap = cm.get_cmap("RdYlGn_r")
 cmap_colors = cmap(np.linspace(0, 1, cmap.N))
 new_cmap = ListedColormap(cmap_colors)
 new_cmap.set_bad(color='white')
 
-# ✅ Plot with tight layout and no axes
+#  Plot with tight layout and no axes
 plt.figure(figsize=(10, 6), facecolor='white')
 img = plt.imshow(masked_score, cmap=new_cmap, vmin=0, vmax=1)
 cbar = plt.colorbar(img, label="Hazard Susceptibility Score", shrink=0.8, pad=0.02)
@@ -309,9 +299,9 @@ from matplotlib.colors import ListedColormap
 import numpy as np
 import numpy.ma as ma
 
-# ------------------------
+
 # Step 1: Classification
-# ------------------------
+
 
 # You can adjust these thresholds based on your results
 breaks = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
@@ -323,9 +313,9 @@ cmap = ListedColormap(colors)
 classified = np.digitize(masked_score, bins=breaks, right=True)
 classified_masked = ma.masked_where(np.isnan(masked_score), classified)
 
-# ------------------------
+
 # Step 2: Plot Map
-# ------------------------
+
 
 fig, ax = plt.subplots(figsize=(10, 6), facecolor='white')
 
@@ -336,9 +326,9 @@ img = ax.imshow(classified_masked, cmap=cmap, vmin=1, vmax=len(colors))
 ax.axis('off')
 ax.set_title("Multi-Hazard Susceptibility Map", fontsize=14)
 
-# ------------------------
+
 # Step 3: Custom Legend
-# ------------------------
+
 
 legend_elements = [Patch(facecolor=colors[i], label=labels[i]) for i in range(len(labels))]
 
@@ -367,7 +357,7 @@ import numpy.ma as ma
 from matplotlib import cm
 from matplotlib.colors import ListedColormap
 
-# 📁 Folder with aligned data
+#  Folder with aligned data
 data_dir = Path("aligned_data")
 
 # AHP Weights (replace with yours if different)
@@ -392,7 +382,7 @@ criteria_types = {
     "cyclone_shelters.tif": "cost"
 }
 
-# 🔁 Combine layers
+#  Combine layers
 final_score = None
 
 for fname, weight in criteria_weights.items():
@@ -400,7 +390,7 @@ for fname, weight in criteria_weights.items():
     with rasterio.open(fpath) as src:
         data = src.read(1).astype(float)
 
-        # ✅ Handle NoData properly
+        #  Handle NoData properly
         nodata_val = src.nodata
         if nodata_val is not None:
             data[data == nodata_val] = np.nan
@@ -416,7 +406,7 @@ for fname, weight in criteria_weights.items():
         weighted = norm * weight
         final_score = weighted if final_score is None else final_score + weighted
 
-# 📦 Save final raster
+#  Save final raster
 output_path = data_dir / "multi_hazard_score.tif"
 with rasterio.open(fpath) as ref:
     profile = ref.profile
@@ -424,7 +414,7 @@ with rasterio.open(fpath) as ref:
     with rasterio.open(output_path, "w", **profile) as dst:
         dst.write(final_score.astype(rasterio.float32), 1)
 
-# 🎨 Mask and Plot with green-to-red gradient, white for no-data
+#  Mask and Plot with green-to-red gradient, white for no-data
 masked = ma.masked_invalid(final_score)
 cmap = cm.get_cmap("RdYlGn_r")
 cmap_colors = cmap(np.linspace(0, 1, cmap.N))
@@ -491,17 +481,17 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap
 
-# 👇 Threshold all very low values (including 0) as invalid
+#  Threshold all very low values (including 0) as invalid
 threshold = 0.01  # You can adjust this if needed
 masked_score = ma.masked_where((final_score < threshold) | np.isnan(final_score), final_score)
 
-# 🎨 Green-to-red colormap with white for masked areas
+#  Green-to-red colormap with white for masked areas
 cmap = cm.get_cmap("RdYlGn_r")
 cmap_colors = cmap(np.linspace(0, 1, cmap.N))
 new_cmap = ListedColormap(cmap_colors)
 new_cmap.set_bad(color='white')
 
-# 🖼️ Plot
+#  Plot
 plt.figure(figsize=(10, 6), facecolor='white')
 img = plt.imshow(masked_score, cmap=new_cmap, vmin=0, vmax=1)
 cbar = plt.colorbar(img, label="Hazard Susceptibility Score")
@@ -516,7 +506,7 @@ plt.show()
 # In[15]:
 
 
-# 📊 Plot result with green-to-red and masked no-data
+#  Plot result with green-to-red and masked no-data
 import numpy.ma as ma
 from matplotlib import cm
 
