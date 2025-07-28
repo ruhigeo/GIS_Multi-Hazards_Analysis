@@ -1,3 +1,5 @@
+![Preview](preview.png)
+
  Multi-Hazard Susceptibility Mapping with Python & AHP
 
 Hi! I'm Ruhi — a Geoinformation Science graduate with a passion for using spatial data to make real-world decisions.  
