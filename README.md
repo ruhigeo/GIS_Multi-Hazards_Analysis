@@ -1,5 +1,5 @@
-![Preview 1](preview_1.png)
-![Preview 2](preview_2.png)
+![Preview 1](preview_01.png)
+![Preview 2](preview_02.png)
 
 
  Multi-Hazard Susceptibility Mapping with Python & AHP
