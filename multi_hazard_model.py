@@ -132,14 +132,14 @@ raster_files = [
 
 # Loop through each raster file and align it
 for filename in raster_files:
-    print(f"🔄 Aligning: {filename}")
+    print(f"Aligning: {filename}")
     src_path = input_dir / filename
     out_path = aligned_dir / filename
     try:
         align_raster_to_reference(src_path, reference_raster, out_path)
-        print(f"✅ Success: {filename}")
+        print(f"Success: {filename}")
     except Exception as e:
-        print(f"❌ Skipped: {filename} — Error: {e}")
+        print(f"Skipped: {filename} — Error: {e}")
 
 # Copy the reference raster to the aligned_data folder
 ref_path = aligned_dir / "cyclone_path.tif"
@@ -190,7 +190,7 @@ weights_df = pd.DataFrame({
 }).sort_values(by="Weight (Decimal)", ascending=False)
 
 # Print weight table
-print("✅ AHP-Derived Weights:")
+print("AHP-Derived Weights:")
 display(weights_df)
 
 # Consistency Check
@@ -211,8 +211,8 @@ RI_dict = {
 RI = RI_dict[n]
 CR = CI / RI
 
-print(f"\n🧠 Consistency Index (CI): {CI:.4f}")
-print(f"📏 Consistency Ratio (CR): {CR:.4f}")
+print(f"\n Consistency Index (CI): {CI:.4f}")
+print(f" Consistency Ratio (CR): {CR:.4f}")
 if CR < 0.1:
     print(" Judgments are consistent (CR < 0.10)")
 else:
